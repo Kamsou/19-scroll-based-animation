@@ -4,7 +4,12 @@
 }
 
 html {
-  background: #1a1a1a;
+  background: #000;
+}
+
+@font-face {
+  font-family: "Santa";
+  src: url("fonts/santa.ttf") format("truetype");
 }
 
 /* html,
@@ -25,6 +30,7 @@ body
   align-items: center;
   height: 100vh;
   position: relative;
+  font-family: "Santa";
   color: #ffeded;
   font-size: 3vw;
   padding-left: 10%;
