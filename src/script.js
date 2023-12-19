@@ -1,19 +1,19 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
-import GUI from "lil-gui";
-import gsap from "gsap";
+// import GUI from "lil-gui";
+// import gsap from "gsap";
 
 /**
  * Debug
  */
-const gui = new GUI();
+// const gui = new GUI();
 
 const parameters = {
   materialColor: "#ffeded",
 };
 
-gui.addColor(parameters, "materialColor");
+// gui.addColor(parameters, "materialColor");
 
 /**
  * Base
@@ -34,10 +34,10 @@ const gradientTexture = textureLoader.load("textures/gradients/3.jpg");
 gradientTexture.magFilter = THREE.NearestFilter;
 
 // Materials
-const material = new THREE.MeshToonMaterial({
-  color: parameters.materialColor,
-  gradientMap: gradientTexture,
-});
+// const material = new THREE.MeshToonMaterial({
+//   color: parameters.materialColor,
+//   gradientMap: gradientTexture,
+// });
 
 // Meshes
 // const objectsDistance = 4;
@@ -67,9 +67,11 @@ const material = new THREE.MeshToonMaterial({
 // Objects
 const objectsDistance = 4;
 const objLoader = new OBJLoader();
+
 const greenMaterial = new THREE.MeshStandardMaterial({ color: 0x0b6623 });
-const redMaterial = new THREE.MeshStandardMaterial({ color: 0x8b0000 });
+const redMaterial = new THREE.MeshStandardMaterial({ color: 0xff5000 });
 const yellowMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+
 let sectionMeshes = [];
 
 function adjustObjectPositionX(obj, position, mobilePosition) {
@@ -80,7 +82,7 @@ function adjustObjectPositionX(obj, position, mobilePosition) {
   }
 }
 
-objLoader.load("objects/christmas-tree-1.obj", (obj) => {
+objLoader.load("objects/ball.obj", (obj) => {
   if (obj.isGroup) {
     obj.children.forEach((child) => {
       child.material = greenMaterial;
@@ -89,16 +91,15 @@ objLoader.load("objects/christmas-tree-1.obj", (obj) => {
     obj.material = greenMaterial;
   }
 
-  obj.position.y = -objectsDistance * 0.2;
-  obj.rotation.x = THREE.MathUtils.degToRad(-90);
-  obj.scale.set(0.17, 0.17, 0.17);
+  obj.position.y = -objectsDistance * 0.4;
+  obj.scale.set(0.02, 0.02, 0.02);
   scene.add(obj);
   sectionMeshes[0] = obj;
 
   adjustObjectPositionX(obj, 1.5, 0.2);
 });
 
-objLoader.load("objects/christmas-tree-2.obj", (obj) => {
+objLoader.load("objects/ball.obj", (obj) => {
   if (obj.isGroup) {
     obj.children.forEach((child) => {
       child.material = redMaterial;
@@ -107,15 +108,16 @@ objLoader.load("objects/christmas-tree-2.obj", (obj) => {
     obj.material = redMaterial;
   }
   obj.position.y = -objectsDistance * 1.1;
-  obj.rotation.x = THREE.MathUtils.degToRad(-90);
-  obj.scale.set(0.2, 0.2, 0.2);
+  obj.rotation.x = THREE.MathUtils.degToRad(-70);
+  obj.scale.set(0.1, 0.1, 0.1);
   scene.add(obj);
   sectionMeshes[1] = obj;
 
   adjustObjectPositionX(obj, -1, -0.2);
 });
 
-objLoader.load("objects/christmas-tree-3.obj", (obj) => {
+objLoader.load("objects/ball.obj", (obj) => {
+  console.log(obj);
   if (obj.isGroup) {
     obj.children.forEach((child) => {
       child.material = yellowMaterial;
@@ -125,8 +127,8 @@ objLoader.load("objects/christmas-tree-3.obj", (obj) => {
   }
 
   obj.position.y = -objectsDistance * 2.1;
-  obj.rotation.x = THREE.MathUtils.degToRad(-110);
-  obj.scale.set(0.1, 0.1, 0.1);
+  obj.rotation.y = THREE.MathUtils.degToRad(90);
+  obj.scale.set(8, 8, 8);
   scene.add(obj);
   sectionMeshes[2] = obj;
 

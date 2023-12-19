@@ -7,9 +7,27 @@ html {
   background: #000;
 }
 
+body {
+  /* Définir le dégradé initial et le faire bouger */
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #008000,
+    #ffd700,
+    #ff0000,
+    #008000,
+    #ffd700
+  );
+  background-size: 200% 200%;
+  animation: backgroundAnimation 15s ease infinite;
+
+  /* Styles supplémentaires pour le body */
+  margin: 0;
+}
+
 @font-face {
   font-family: "Santa";
-  src: url("fonts/santa.ttf") format("truetype");
+  src: url("fonts/ChristmasMiracle.ttf") format("truetype");
 }
 
 /* html,
