@@ -92,7 +92,6 @@ mtlLoader.load("objects/tree2.mtl", (materials) => {
 
   fbxLoader.load("objects/tree2.fbx", (obj) => {
     obj.traverse((child) => {
-      console.log(child);
       if (child.isMesh && materials.materials[child.material.name]) {
         child.material = materials.materials[child.material.name];
       }
@@ -132,7 +131,6 @@ mtlLoader.load("objects/ball2.mtl", (materials) => {
       }
 
       if (child.isMesh) {
-        console.log(child);
         child.material.map = texture;
         child.material.map = texture2;
         child.material.needsUpdate = true;
@@ -266,7 +264,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 
 let scrollY = window.scrollY;
-let currentSection = 0;
+// let currentSection = 0;
 
 window.addEventListener("scroll", () => {
   scrollY = window.scrollY;
