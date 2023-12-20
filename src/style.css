@@ -27,7 +27,7 @@ body {
 
 @font-face {
   font-family: "ChristmasMiracle";
-  src: url("./static/fonts/christmas-miracle.ttf") format("truetype");
+  src: url("/fonts/christmas-miracle.ttf") format("truetype");
 }
 
 /* html,
