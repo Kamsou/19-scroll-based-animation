@@ -26,8 +26,8 @@ body {
 }
 
 @font-face {
-  font-family: "Santa";
-  src: url("fonts/ChristmasMiracle.ttf") format("truetype");
+  font-family: "ChristmasMiracle";
+  src: url("fonts/christmas-miracle.ttf") format("truetype");
 }
 
 /* html,
@@ -48,7 +48,7 @@ body
   align-items: center;
   height: 100vh;
   position: relative;
-  font-family: "Santa";
+  font-family: "ChristmasMiracle";
   color: #ffeded;
   font-size: 3vw;
   padding-left: 10%;

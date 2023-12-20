@@ -111,7 +111,7 @@ mtlLoader.load("objects/tree2.mtl", (materials) => {
     scene.add(obj);
     sectionMeshes[0] = obj;
 
-    adjustObjectPositionX(obj, 1, 0.2);
+    adjustObjectPositionX(obj, 0.7, 0.2);
   });
 });
 
@@ -140,7 +140,6 @@ mtlLoader.load("objects/ball2.mtl", (materials) => {
     });
 
     obj.position.y = -objectsDistance * 1.1;
-    // obj.rotation.x = THREE.MathUtils.degToRad(-70);
     obj.scale.set(0.1, 0.1, 0.1);
     scene.add(obj);
     sectionMeshes[1] = obj;
@@ -157,7 +156,7 @@ fbxLoader.load("objects/sled.fbx", (obj) => {
   scene.add(obj);
   sectionMeshes[2] = obj;
 
-  adjustObjectPositionX(obj, 1.5, 0.3);
+  adjustObjectPositionX(obj, 2, 1);
 
   // Créer et positionner la lumière
   const spotLight = new THREE.SpotLight(0xffffff);
