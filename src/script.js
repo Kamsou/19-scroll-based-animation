@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 
 // import GUI from "lil-gui";
 // import gsap from "gsap";
@@ -67,10 +69,13 @@ gradientTexture.magFilter = THREE.NearestFilter;
 // Objects
 const objectsDistance = 4;
 const objLoader = new OBJLoader();
+const fbxLoader = new FBXLoader();
+const mtlLoader = new MTLLoader();
 
 const greenMaterial = new THREE.MeshStandardMaterial({ color: 0x0b6623 });
 const redMaterial = new THREE.MeshStandardMaterial({ color: 0xff5000 });
 const yellowMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+const whiteMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
 let sectionMeshes = [];
 
@@ -82,57 +87,83 @@ function adjustObjectPositionX(obj, position, mobilePosition) {
   }
 }
 
-objLoader.load("objects/ball.obj", (obj) => {
-  if (obj.isGroup) {
-    obj.children.forEach((child) => {
-      child.material = greenMaterial;
+mtlLoader.load("objects/tree2.mtl", (materials) => {
+  materials.preload();
+
+  fbxLoader.load("objects/tree2.fbx", (obj) => {
+    obj.traverse((child) => {
+      console.log(child);
+      if (child.isMesh && materials.materials[child.material.name]) {
+        child.material = materials.materials[child.material.name];
+      }
     });
-  } else {
-    obj.material = greenMaterial;
-  }
 
-  obj.position.y = -objectsDistance * 0.4;
-  obj.scale.set(0.02, 0.02, 0.02);
-  scene.add(obj);
-  sectionMeshes[0] = obj;
+    if (obj.isGroup) {
+      obj.children.forEach((child) => {
+        child.material = greenMaterial;
+      });
+    } else {
+      obj.material = greenMaterial;
+    }
 
-  adjustObjectPositionX(obj, 1.5, 0.2);
+    obj.position.y = -objectsDistance * 0.4;
+    obj.scale.set(0.008, 0.008, 0.008);
+    scene.add(obj);
+    sectionMeshes[0] = obj;
+
+    adjustObjectPositionX(obj, 1, 0.2);
+  });
 });
 
-objLoader.load("objects/ball.obj", (obj) => {
-  if (obj.isGroup) {
-    obj.children.forEach((child) => {
-      child.material = redMaterial;
-    });
-  } else {
-    obj.material = redMaterial;
-  }
-  obj.position.y = -objectsDistance * 1.1;
-  obj.rotation.x = THREE.MathUtils.degToRad(-70);
-  obj.scale.set(0.1, 0.1, 0.1);
-  scene.add(obj);
-  sectionMeshes[1] = obj;
+const texture = textureLoader.load(
+  "objects/Christmas_ball_christmas_ball_Roughness.png"
+);
+const texture2 = textureLoader.load(
+  "objects/Christmas_ball_christmas_ball_BaseColor.png"
+);
 
-  adjustObjectPositionX(obj, -1, -0.2);
+mtlLoader.load("objects/ball2.mtl", (materials) => {
+  materials.preload();
+
+  fbxLoader.load("objects/ball2.fbx", (obj) => {
+    obj.traverse((child) => {
+      if (child.isMesh && materials.materials[child.material.name]) {
+        child.material = materials.materials[child.material.name];
+      }
+
+      if (child.isMesh) {
+        console.log(child);
+        child.material.map = texture;
+        child.material.map = texture2;
+        child.material.needsUpdate = true;
+      }
+    });
+
+    obj.position.y = -objectsDistance * 1.1;
+    // obj.rotation.x = THREE.MathUtils.degToRad(-70);
+    obj.scale.set(0.1, 0.1, 0.1);
+    scene.add(obj);
+    sectionMeshes[1] = obj;
+
+    adjustObjectPositionX(obj, -1, -0.2);
+  });
 });
 
-objLoader.load("objects/ball.obj", (obj) => {
-  console.log(obj);
-  if (obj.isGroup) {
-    obj.children.forEach((child) => {
-      child.material = yellowMaterial;
-    });
-  } else {
-    obj.material = yellowMaterial;
-  }
-
-  obj.position.y = -objectsDistance * 2.1;
-  obj.rotation.y = THREE.MathUtils.degToRad(90);
-  obj.scale.set(8, 8, 8);
+fbxLoader.load("objects/sled.fbx", (obj) => {
+  obj.position.y = -objectsDistance * 2;
+  obj.scale.set(0.01, 0.01, 0.01);
+  obj.rotation.y = THREE.MathUtils.degToRad(60);
+  obj.rotation.x = THREE.MathUtils.degToRad(20);
   scene.add(obj);
   sectionMeshes[2] = obj;
 
-  adjustObjectPositionX(obj, 1, 0.3);
+  adjustObjectPositionX(obj, 1.5, 0.3);
+
+  // Créer et positionner la lumière
+  const spotLight = new THREE.SpotLight(0xffffff);
+  spotLight.position.set(1, 1, 1);
+  spotLight.target = obj;
+  scene.add(spotLight);
 });
 
 function onWindowResize() {
