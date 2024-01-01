@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteRule ^sphere$ sphere.html [L]
+RewriteRule ^sphere-2$ sphere-2.html [L]
