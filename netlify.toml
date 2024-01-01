@@ -3,9 +3,11 @@
 from = "/"
 to = "/index.html"
 status = 200
+force = true
 
 [[redirects]]
 from = "/sphere"
 to = "/sphere-test.html"
 status = 200
+force = true
 
