@@ -10,6 +10,7 @@ const scene = new THREE.Scene();
 
 // RENDERER
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setClearColor(0xfffeeb);
@@ -24,6 +25,13 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, minClip, maxClip);
 camera.position.set(0, 0, 15);
 camera.lookAt(scene.position);
 scene.add(camera);
+
+// LIGHT
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight.castShadow = true;
+directionalLight.position.set(100, 100, 200);
+scene.add(ambientLight, directionalLight);
 
 // Particles
 const particleCount = 10000;
@@ -82,11 +90,19 @@ void main() {
 
 const coreFragmentShader = `
 varying vec3 vNormal;
-uniform float time;
+uniform vec3 lightDirection;
 
 void main() {
-  vec4 yellowColor = vec4(0.9686, 0.7824, 0.5196, 0.8); 
-  gl_FragColor = yellowColor;
+  vec3 normalizedNormal = normalize(vNormal);
+  vec3 normLightDir = normalize(lightDirection - vec3(0.0, 0.0, 0.0)); // Normalisation de la direction de la lumière
+
+  float lightIntensity = dot(normalizedNormal, normLightDir);
+  lightIntensity = clamp(lightIntensity, 0.0, 1.0);
+
+  vec4 yellowColor = vec4(0.9686, 0.7824, 0.5196, 0.9); 
+  vec4 shadowColor = vec4(0.0, 0.0, 0.0, 0.3); 
+
+  gl_FragColor = mix(shadowColor, yellowColor, lightIntensity);
 }
 `;
 
@@ -95,17 +111,14 @@ const coreMaterial = new THREE.ShaderMaterial({
   fragmentShader: coreFragmentShader,
   uniforms: {
     time: { value: 0 },
+    lightDirection: { value: directionalLight.position }, // Ajouter la direction de la lumière
   },
 });
 const core = new THREE.Mesh(coreGeometry, coreMaterial);
+core.castShadow = true; // Permettre au noyau de projeter des ombres
+core.receiveShadow = true; // Permettre au noyau de recevoir des ombres
 scene.add(core);
-
-// LIGHT
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight.castShadow = true;
-directionalLight.position.set(100, 100, 200);
-scene.add(ambientLight, directionalLight);
+scene.add(core);
 
 // HELPERS
 const axes = new THREE.AxesHelper(20);
