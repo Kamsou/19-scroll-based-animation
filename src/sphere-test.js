@@ -1,15 +1,15 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
 import GUI from "lil-gui";
 const gui = new GUI();
 
 const settings = {
-  speed: 0.02,
-  density: 5.84,
-  strength: 0.14,
-  frequency: 3,
-  amplitude: 1,
-  intensity: 3.6,
+  speed: 0.1,
+  density: 10,
+  strength: 0.03,
+  frequency: 1.1,
+  amplitude: 0,
+  intensity: 0,
 };
 const folder1 = gui.addFolder("Noise");
 const folder2 = gui.addFolder("Rotation");
@@ -191,14 +191,15 @@ const fragmentShader = `
     vec3 yellowColor = vec3(247.0 / 255.0, 225.0 / 255.0, 107.0 / 255.0);
 
     // Adding a circulating lines effect
-    float lines = sin(vUv.x * 20.0 + uTime) * cos(vUv.y * 20.0 + uTime);
+    // With movement float lines = sin(vUv.x * 20.0 + uTime) * cos(vUv.y * 20.0 + uTime);
+
+    float lines = sin(vUv.x * 10.6) * cos(vUv.y * 12.5);
 
     // Mix the yellow color with the lines effect
     vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
 
     // Output the final color
     gl_FragColor = vec4(finalColor, 1.0);
-    
   }  
 `;
 
@@ -220,7 +221,6 @@ class Scene {
     this.scene = new THREE.Scene();
 
     this.clock = new THREE.Clock();
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.init();
     this.animate();
@@ -278,8 +278,6 @@ class Scene {
   }
 
   render() {
-    this.controls.update();
-
     // Update uniforms
     this.mesh.material.uniforms.uTime.value = this.clock.getElapsedTime();
     this.mesh.material.uniforms.uSpeed.value = settings.speed;
