@@ -7,8 +7,75 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <canvas class="webgl"></canvas>
+    <div class="container">
+      <div class="circle">
+        <div class="point"></div>
+        <div class="point"></div>
+        <div class="point"></div>
+      </div>
+      <canvas class="webgl"></canvas>
+    </div>
 
     <script type="module" src="./sphere-test.js"></script>
   </body>
 </html>
+
+<style>
+  .container {
+    position: relative;
+    width: 100vw; /* Largeur du conteneur */
+    height: 100vh; /* Hauteur du conteneur */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .circle {
+    z-index: 10 !important;
+    position: absolute;
+    width: 50vh; /* La moitié de la largeur du canvas */
+    height: 50vh; /* La moitié de la hauteur du canvas */
+    border-radius: 100%;
+    border: 2px dashed #ce2727;
+    animation: spin 295s linear infinite;
+  }
+
+  .circle .point {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ce2727;
+    border-radius: 100%;
+  }
+
+  .point:nth-child(1) {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fbec80;
+    border: 1px solid #ce2727;
+  }
+
+  .point:nth-child(2) {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+  }
+
+  .point:nth-child(3) {
+    top: 59%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
