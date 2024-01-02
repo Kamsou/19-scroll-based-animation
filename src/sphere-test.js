@@ -5,11 +5,11 @@ const gui = new GUI();
 
 const settings = {
   speed: 0.04,
-  density: 10,
+  density: 6.44,
   strength: 0.03,
   frequency: 1.4,
   amplitude: 0,
-  intensity: 10,
+  intensity: 0,
 };
 const folder1 = gui.addFolder("Noise");
 const folder2 = gui.addFolder("Rotation");
@@ -180,39 +180,29 @@ const vertexShader = `
 `;
 
 const fragmentShader = `
-  varying float vDistort;
-  varying vec2 vUv;
+varying float vDistort;
+varying vec2 vUv;
 
-  uniform float uTime;
-  uniform float uIntensity;
+uniform float uTime;
+uniform float uIntensity;
 
-  void main() {
-    float distort = vDistort * uIntensity;
+void main() {
+  float distort = vDistort * uIntensity;
 
-    // Couleur jaune
-    vec3 yellowColor = vec3(0.970, 0.896, 0.439);
+  // Convert #F7E16B to normalized RGB values
+  vec3 yellowColor = vec3(247.0 / 255.0, 225.0 / 255.0, 107.0 / 255.0);
 
-    // Effet de lignes circulaires
-    float lines = sin(vUv.x * 1.0) * cos(vUv.y * 6.3);
+  // Adding a circulating lines effect
+  // With movement float lines = sin(vUv.x * 20.0 + uTime) * cos(vUv.y * 20.0 + uTime);
 
-    // Mélanger la couleur jaune avec l'effet de lignes
-    vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
+  float lines = sin(vUv.x * 10.6) * cos(vUv.y * 12.5);
 
-    // Calculer la distance au centre
-    float centerDistance = distance(vUv, vec2(0.72, 0.5));
+  // Mix the yellow color with the lines effect
+  vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
 
-    // Couleur  pour le noyau
-    vec3 coreColor = vec3(0.998, 0.996, 0.739);
-
-    // Définir la taille du noyau
-    float coreSize = 0.33; // Ajustez cette valeur pour changer la taille du noyau
-
-    // Mélanger avec la couleur noire si proche du centre
-    finalColor = mix(finalColor, coreColor, smoothstep(coreSize, 0.0, centerDistance));
-
-    // Sortie de la couleur finale
-    gl_FragColor = vec4(finalColor, 1.0);
-  }  
+  // Output the final color
+  gl_FragColor = vec4(finalColor, 1.0);
+}
 `;
 
 class Scene {
