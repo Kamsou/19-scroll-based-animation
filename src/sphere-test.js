@@ -202,10 +202,10 @@ const fragmentShader = `
     float centerDistance = distance(vUv, vec2(0.72, 0.5));
 
     // Couleur noire pour le noyau
-    vec3 blackColor = vec3(0.970, 1.050, 0.439);
+    vec3 blackColor = vec3(0.998, 0.996, 0.739);
 
     // Définir la taille du noyau
-    float coreSize = 0.1; // Ajustez cette valeur pour changer la taille du noyau
+    float coreSize = 0.25; // Ajustez cette valeur pour changer la taille du noyau
 
     // Mélanger avec la couleur noire si proche du centre
     finalColor = mix(finalColor, blackColor, smoothstep(coreSize, 0.0, centerDistance));
