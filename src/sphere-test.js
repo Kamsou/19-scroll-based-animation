@@ -4,7 +4,7 @@ import GUI from "lil-gui";
 const gui = new GUI();
 
 const settings = {
-  speed: 0.04,
+  speed: 0.1,
   density: 6.44,
   strength: 0.03,
   frequency: 1.4,
