@@ -193,7 +193,7 @@ const fragmentShader = `
     vec3 yellowColor = vec3(0.970, 0.896, 0.439);
 
     // Effet de lignes circulaires
-    float lines = sin(vUv.x * 3.9) * cos(vUv.y * 5.0);
+    float lines = sin(vUv.x * 1.0) * cos(vUv.y * 6.3);
 
     // Mélanger la couleur jaune avec l'effet de lignes
     vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
@@ -201,14 +201,14 @@ const fragmentShader = `
     // Calculer la distance au centre
     float centerDistance = distance(vUv, vec2(0.72, 0.5));
 
-    // Couleur noire pour le noyau
-    vec3 blackColor = vec3(0.998, 0.996, 0.739);
+    // Couleur  pour le noyau
+    vec3 coreColor = vec3(0.998, 0.996, 0.739);
 
     // Définir la taille du noyau
-    float coreSize = 0.25; // Ajustez cette valeur pour changer la taille du noyau
+    float coreSize = 0.33; // Ajustez cette valeur pour changer la taille du noyau
 
     // Mélanger avec la couleur noire si proche du centre
-    finalColor = mix(finalColor, blackColor, smoothstep(coreSize, 0.0, centerDistance));
+    finalColor = mix(finalColor, coreColor, smoothstep(coreSize, 0.0, centerDistance));
 
     // Sortie de la couleur finale
     gl_FragColor = vec4(finalColor, 1.0);
