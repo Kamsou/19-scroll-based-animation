@@ -4,12 +4,12 @@ import GUI from "lil-gui";
 const gui = new GUI();
 
 const settings = {
-  speed: 0.02,
-  density: 9,
-  strength: 0.05,
-  frequency: 1.8,
-  amplitude: 0.2,
-  intensity: 2.7,
+  speed: 0.04,
+  density: 10,
+  strength: 0.03,
+  frequency: 1.4,
+  amplitude: 0,
+  intensity: 10,
 };
 const folder1 = gui.addFolder("Noise");
 const folder2 = gui.addFolder("Rotation");
