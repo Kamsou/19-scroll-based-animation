@@ -210,13 +210,13 @@ const fragmentShader = `
     float distort = vDistort * uIntensity;
 
     // Couleur jaune claire
-    vec3 yellowColor = vec3(1.200, 0.906, 0.499);
+    vec3 yellowColor = vec3(0.990, 0.946, 0.639);
 
     // Effet de lignes circulaires
-    // float lines = sin(vUv.x * 1.0) * cos(vUv.y * 6.2);
+    float lines = sin(vUv.x * -0.7) * cos(vUv.y * 1.2);
 
     // Mélangez la couleur jaune avec l'effet de lignes
-    vec3 finalColor = mix(yellowColor, vec3(1.0), distort);
+    vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
 
     // Calculer la distance au centre de la sphère
     float centerDistance = distance(vUv, vec2(0.75, 0.5));
