@@ -4,12 +4,12 @@ import GUI from "lil-gui";
 const gui = new GUI();
 
 const settings = {
-  speed: 0.1,
-  density: 6.44,
-  strength: 0.03,
-  frequency: 1.4,
-  amplitude: 0,
-  intensity: 0,
+  speed: 0.02,
+  density: 9,
+  strength: 0.05,
+  frequency: 1.8,
+  amplitude: 0.2,
+  intensity: 2.7,
 };
 const folder1 = gui.addFolder("Noise");
 const folder2 = gui.addFolder("Rotation");
@@ -187,48 +187,28 @@ const fragmentShader = `
   uniform float uIntensity;
 
   void main() {
-    // float distort = vDistort * uIntensity;
-
-    // vec3 yellowColor = vec3(0.969, 0.882, 0.420);
-    // vec3 yellowColor = vec3(0.970, 0.896, 0.439);
-
-    // Adding a circulating lines effect
-    // With movement float lines = sin(vUv.x * 20.0 + uTime) * cos(vUv.y * 20.0 + uTime);
-    // float lines =  sin(vUv.x * 20.0) * cos(vUv.y * 20.0);
-
-    // Mix the yellow color with the lines effect
-    // vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
-    // vec3 finalColor = mix(yellowColor, vec3(1.0), distort);
-
-
-    // Output the final color
-    // gl_FragColor = vec4(finalColor, 1.0);
-
-
-    /////////////////////////////////////
-
     float distort = vDistort * uIntensity;
 
-    // Couleur jaune claire
-    vec3 yellowColor = vec3(0.990, 0.946, 0.639);
+    // Couleur jaune
+    vec3 yellowColor = vec3(0.970, 0.896, 0.439);
 
     // Effet de lignes circulaires
-    float lines = sin(vUv.x * -0.7) * cos(vUv.y * 1.2);
+    float lines = sin(vUv.x * 3.9) * cos(vUv.y * 5.0);
 
-    // Mélangez la couleur jaune avec l'effet de lignes
+    // Mélanger la couleur jaune avec l'effet de lignes
     vec3 finalColor = mix(yellowColor, vec3(1.0), distort + lines);
 
-    // Calculer la distance au centre de la sphère
-    float centerDistance = distance(vUv, vec2(0.75, 0.5));
+    // Calculer la distance au centre
+    float centerDistance = distance(vUv, vec2(0.72, 0.5));
 
-    // Couleur rouge pour le noyau
-    vec3 yellowLightColor = vec3(1.000, 1.026, 0.629);
+    // Couleur noire pour le noyau
+    vec3 blackColor = vec3(0.970, 1.050, 0.439);
 
-    // Définir la taille du noyau (ajuster la valeur en fonction de la taille de la sphère)
-    float coreSize = 0.16; // 5% de la taille de la texture, ajustez selon la taille de votre sphère
+    // Définir la taille du noyau
+    float coreSize = 0.1; // Ajustez cette valeur pour changer la taille du noyau
 
-    // Mélanger avec la couleur rouge si proche du centre
-    finalColor = mix(finalColor, yellowLightColor, smoothstep(coreSize, 0.0, centerDistance));
+    // Mélanger avec la couleur noire si proche du centre
+    finalColor = mix(finalColor, blackColor, smoothstep(coreSize, 0.0, centerDistance));
 
     // Sortie de la couleur finale
     gl_FragColor = vec4(finalColor, 1.0);
