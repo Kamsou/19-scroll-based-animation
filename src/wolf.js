@@ -24,29 +24,6 @@ controls.enableZoom = true; // Active le zoom
 controls.zoomSpeed = 1.0; // Ajuste la vitesse de zoom
 controls.enableRotate = false;
 
-// Grass
-
-// mtlLoader.load(
-//   "objects/grass/10450_Rectangular_Grass_Patch_v1_iterations-2.mtl",
-//   (materials) => {
-//     materials.preload();
-
-//     objLoader.setMaterials(materials);
-//     objLoader.load(
-//       "objects/grass/10450_Rectangular_Grass_Patch_v1_iterations-2.obj",
-//       (object) => {
-//         object.traverse((child) => {
-//           if (child instanceof THREE.Mesh && child.material.map) {
-//             child.material.map.repeat.set(0.5, 0.5);
-//             // child.material.map.needsUpdate = true;
-//           }
-//         });
-//         scene.add(object);
-//       }
-//     );
-//   }
-// );
-
 // Wolf;
 
 const textureLoader = new THREE.TextureLoader();
