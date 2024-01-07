@@ -1,13 +1,45 @@
 import * as THREE from "three";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+const loaderElement = document.createElement("div");
+loaderElement.style.position = "absolute";
+loaderElement.style.top = "0";
+loaderElement.style.left = "0";
+loaderElement.style.width = "100%";
+loaderElement.style.height = "100%";
+loaderElement.style.display = "flex";
+loaderElement.style.justifyContent = "center";
+loaderElement.style.alignItems = "center";
+loaderElement.style.backgroundColor = "rgba(0, 0, 0, 1)"; // Fond semi-transparent
+loaderElement.style.color = "white";
+loaderElement.style.fontSize = "2em";
+document.body.appendChild(loaderElement);
+
+// 1. Initialisation du LoadingManager
+const manager = new THREE.LoadingManager();
+
+manager.onStart = function (url, itemsLoaded, itemsTotal) {
+  console.log("Le chargement a commencé.");
+  loaderElement.style.display = "block";
+};
+
+manager.onLoad = function () {
+  console.log("Toutes les ressources sont chargées.");
+  loaderElement.style.display = "none";
+  // Ici, masquez votre indicateur de chargement
+};
+
+manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+  console.log(
+    "Chargement en cours: " + url + " (" + itemsLoaded + "/" + itemsTotal + ")"
+  );
+  loaderElement.innerText = `Le loup dans le désert...`;
+  // Ici, mettez à jour votre indicateur de chargement si nécessaire
+};
+
 const scene = new THREE.Scene();
-const objLoader = new OBJLoader();
-const mtlLoader = new MTLLoader();
-const gltfLoader = new GLTFLoader();
+const gltfLoader = new GLTFLoader(manager);
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -16,17 +48,29 @@ const camera = new THREE.PerspectiveCamera(
 );
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x87ceeb);
+// renderer.setClearColor(0x87ceeb);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = true; // Active le zoom
 controls.zoomSpeed = 1.0; // Ajuste la vitesse de zoom
-controls.enableRotate = false;
+controls.enableRotate = true;
+
+// Scene background
+const textureLoader = new THREE.TextureLoader();
+
+gltfLoader.load("objects/desert-field/desert-field.glb", (gltf) => {
+  const landscape = gltf.scene;
+
+  // position
+  landscape.position.set(-50, -10, -1);
+  landscape.rotateY(THREE.MathUtils.degToRad(90));
+
+  scene.add(landscape);
+});
 
 // Wolf;
 
-const textureLoader = new THREE.TextureLoader();
 const myTexture = textureLoader.load(
   "objects/wolf/Material__wolf_col_tga_diffuse_jpeg.jpg",
   function (texture) {
@@ -38,21 +82,20 @@ const myTexture = textureLoader.load(
 const eyes = textureLoader.load("objects/wolf/eyes_diffuse_jpeg.jpg");
 const fur = textureLoader.load("objects/wolf/fella3_Kopie_7.png");
 const furAlpha = textureLoader.load("objects/wolf/Fur_Alpha_3.png");
-const furNormal = textureLoader.load("objects/wolf/Fur_2.png");
 
 let mixer;
 let wolf;
 let runAction, idleAction;
 let currentAction;
+let cameraOffset;
 
 gltfLoader.load("objects/wolf/Wolf-Blender-2.82a.glb", (gltf) => {
   wolf = gltf.scene;
 
-  const desiredHeight = 40;
+  wolf.position.set(0, 6.635, 8);
 
   // add texture
   wolf.traverse((object) => {
-    console.log(object);
     if (object.name === "Wolf1_Material__wolf_col_tga_0") {
       object.material.map = myTexture;
       object.material.needsUpdate = true;
@@ -71,20 +114,6 @@ gltfLoader.load("objects/wolf/Wolf-Blender-2.82a.glb", (gltf) => {
     }
   });
 
-  // Calculez la hauteur actuelle du loup
-  const box = new THREE.Box3().setFromObject(wolf);
-  const currentHeight = box.max.y - box.min.y;
-
-  const scale = desiredHeight / currentHeight;
-
-  console.log(wolf);
-
-  // Appliquez cette échelle au loup
-  wolf.scale.set(scale, scale, scale);
-  wolf.rotation.x = 850;
-  wolf.rotation.y = 900;
-  wolf.position.z = 0;
-
   // Créez un AnimationMixer et associez-le au loup
   mixer = new THREE.AnimationMixer(wolf);
 
@@ -94,7 +123,14 @@ gltfLoader.load("objects/wolf/Wolf-Blender-2.82a.glb", (gltf) => {
   currentAction = idleAction.play();
 
   scene.add(wolf);
+
+  cameraOffset = new THREE.Vector3(0, -5, 10);
+  cameraOffset.applyQuaternion(wolf.quaternion);
+  cameraOffset.add(wolf.position);
 });
+
+camera.fov = 20;
+camera.updateProjectionMatrix();
 
 function switchAnimation() {
   // Jouer l'animation de course si l'une des touches de mouvement est enfoncée
@@ -182,26 +218,38 @@ light.position.set(0, 20, 0);
 light.intensity = 4;
 scene.add(light);
 
-// Ajustement de la caméra
-camera.position.set(0, -290, 100); // Ajustez la position de la caméra
-camera.lookAt(scene.position);
-
 function animate() {
   requestAnimationFrame(animate);
 
   if (wolf) {
-    // Mise à jour de la position et de l'orientation du loup
-    if (moveForward) wolf.position.z -= wolfSpeed;
-    if (moveBackward) wolf.position.z += wolfSpeed;
+    // Calculez la direction vers laquelle le loup fait face
+    const direction = new THREE.Vector3();
+    wolf.getWorldDirection(direction);
+
+    // Mise à jour de la position du loup en fonction de la direction
+    if (moveForward) {
+      wolf.position.addScaledVector(direction, wolfSpeed);
+    }
+    if (moveBackward) {
+      wolf.position.addScaledVector(direction, -wolfSpeed);
+    }
+
+    // Rotation du loup
     if (rotateLeft) wolf.rotation.y += wolfRotationSpeed;
     if (rotateRight) wolf.rotation.y -= wolfRotationSpeed;
+
+    // Mettre à jour la position de la caméra pour maintenir l'offset
+    const cameraPosition = wolf.position.clone().add(cameraOffset);
+    camera.position.copy(cameraPosition);
+
+    // Faire en sorte que la caméra regarde toujours le loup
+    camera.lookAt(wolf.position);
   }
 
   // Mise à jour de l'AnimationMixer
   const delta = clock.getDelta(); // Assurez-vous d'avoir une instance de THREE.Clock
   if (mixer) mixer.update(delta);
 
-  controls.update();
   renderer.render(scene, camera);
 }
 
