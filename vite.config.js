@@ -16,6 +16,8 @@ export default {
         "sphere-test-3": "src/sphere-2.html",
         sphere: "src/sphere.html",
         wolf: "src/wolf.html",
+        cube: "src/cube.html",
+        cone: "src/cone.html",
       },
     },
   },
