@@ -59,12 +59,27 @@ controls.enableRotate = true;
 // Scene background
 const textureLoader = new THREE.TextureLoader();
 
+const sandDiffuse = textureLoader.load(
+  "objects/desert-field/textures/aerial_sand_diff_4k.jpg"
+);
+
+const sandMaterial = new THREE.MeshStandardMaterial({
+  map: sandDiffuse,
+});
+
 gltfLoader.load("objects/desert-field/desert-field.glb", (gltf) => {
   const landscape = gltf.scene;
 
   // position
   landscape.position.set(-50, -10, -1);
   landscape.rotateY(THREE.MathUtils.degToRad(90));
+
+  // Appliquer le matériau
+  landscape.traverse((child) => {
+    if (child.isMesh) {
+      child.material = sandMaterial;
+    }
+  });
 
   scene.add(landscape);
 });
