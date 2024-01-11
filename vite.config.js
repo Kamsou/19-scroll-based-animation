@@ -13,7 +13,6 @@ export default {
     rollupOptions: {
       input: {
         main: "src/index.html",
-        "sphere-test-3": "src/sphere-2.html",
         sphere: "src/sphere.html",
         wolf: "src/wolf.html",
         cube: "src/cube.html",
