@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { ceilPowerOfTwo } from "three/src/math/MathUtils";
 
 const loaderElement = document.createElement("div");
 loaderElement.style.position = "absolute";
@@ -47,8 +48,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 const renderer = new THREE.WebGLRenderer();
+const textureLoader = new THREE.TextureLoader();
 renderer.setSize(window.innerWidth, window.innerHeight);
-// renderer.setClearColor(0x87ceeb);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -56,33 +57,85 @@ controls.enableZoom = true; // Active le zoom
 controls.zoomSpeed = 1.0; // Ajuste la vitesse de zoom
 controls.enableRotate = true;
 
-// Scene background
-const textureLoader = new THREE.TextureLoader();
+camera.position.z = 15;
+camera.position.y = 3;
+camera.position.x = 0;
 
-const sandDiffuse = textureLoader.load(
-  "objects/desert-field/textures/aerial_sand_diff_4k.jpg"
-);
+// Scene background mountain #1
 
-const sandMaterial = new THREE.MeshStandardMaterial({
-  map: sandDiffuse,
-});
+// const sandDiffuse = textureLoader.load(
+//   "objects/desert-field/textures/aerial_sand_diff_4k.jpg"
+// );
 
-gltfLoader.load("objects/desert-field/desert-field.glb", (gltf) => {
-  const landscape = gltf.scene;
+// const sandMaterial = new THREE.MeshStandardMaterial({
+//   map: sandDiffuse,
+// });
 
-  // position
-  landscape.position.set(-50, -10, -1);
-  landscape.rotateY(THREE.MathUtils.degToRad(90));
+// gltfLoader.load("objects/desert-field/desert-field.glb", (gltf) => {
+//   const landscape = gltf.scene;
 
-  // Appliquer le matériau
-  landscape.traverse((child) => {
-    if (child.isMesh) {
-      child.material = sandMaterial;
+//   // position
+//   landscape.position.set(-50, -10, -1);
+//   landscape.rotateY(THREE.MathUtils.degToRad(90));
+
+//   // Appliquer le matériau
+//   landscape.traverse((child) => {
+//     if (child.isMesh) {
+//       child.material = sandMaterial;
+//     }
+//   });
+
+//   scene.add(landscape);
+// });
+
+// Scene background beach #2
+
+let beach;
+let trees = [];
+
+gltfLoader.load("objects/beach.glb", (gltf) => {
+  beach = gltf.scene;
+
+  beach.traverse((object) => {
+    console.log(object.name);
+    if (
+      object.name.includes(
+        "Palm" ||
+          object.name.includes("Trees") ||
+          object.name.includes("Rocks") ||
+          object.name.includes("Leaves") ||
+          object.name.includes("RootNode") ||
+          object.name.includes("Coco")
+      )
+    ) {
+      trees.push(object);
     }
   });
 
-  scene.add(landscape);
+  beach.rotateY(THREE.MathUtils.degToRad(-90));
+
+  scene.add(beach);
 });
+
+function checkCollisionWithTrees(direction, distance) {
+  const raycaster = new THREE.Raycaster(
+    wolf.position,
+    direction.normalize(),
+    0,
+    distance
+  );
+  const collisions = raycaster.intersectObjects(trees);
+
+  return collisions.length > 0;
+}
+
+function moveWolf(direction, distance) {
+  if (!checkCollisionWithTrees(direction, distance)) {
+    wolf.position.addScaledVector(direction, distance);
+  } else {
+    console.log("Collision");
+  }
+}
 
 // Wolf;
 
@@ -102,15 +155,15 @@ let mixer;
 let wolf;
 let runAction, idleAction;
 let currentAction;
-let cameraOffset;
 
 gltfLoader.load("objects/wolf/Wolf-Blender-2.82a.glb", (gltf) => {
   wolf = gltf.scene;
 
-  wolf.position.set(0, 6.635, 8);
-
-  // add texture
   wolf.traverse((object) => {
+    if (object.name === "Circle") {
+      object.visible = false;
+    }
+
     if (object.name === "Wolf1_Material__wolf_col_tga_0") {
       object.material.map = myTexture;
       object.material.needsUpdate = true;
@@ -137,15 +190,32 @@ gltfLoader.load("objects/wolf/Wolf-Blender-2.82a.glb", (gltf) => {
   idleAction = mixer.clipAction(gltf.animations[4]);
   currentAction = idleAction.play();
 
-  scene.add(wolf);
+  wolf.position.set(0, 0, 13);
 
-  cameraOffset = new THREE.Vector3(0, -5, 10);
-  cameraOffset.applyQuaternion(wolf.quaternion);
-  cameraOffset.add(wolf.position);
+  scene.add(wolf);
 });
 
-camera.fov = 20;
-camera.updateProjectionMatrix();
+const raycaster = new THREE.Raycaster();
+const downVector = new THREE.Vector3(0, -1, 0);
+
+function adjustWolfHeight() {
+  if (!beach || !wolf) return; // Vérifiez si beach et wolf sont chargés
+
+  // Position au-dessus du loup pour le raycasting
+  const wolfPositionAbove = wolf.position.clone();
+  wolfPositionAbove.y += 5; // Ajustez cette valeur si nécessaire
+
+  raycaster.set(wolfPositionAbove, downVector);
+  const intersects = raycaster.intersectObject(beach, true);
+
+  if (intersects.length > 0) {
+    const intersect = intersects[0];
+
+    // Ajustez cette valeur pour positionner correctement le loup sur le terrain
+    const wolfHeightOffset = 0; // Hauteur du loup depuis son point d'origine
+    wolf.position.y = intersect.point.y + wolfHeightOffset;
+  }
+}
 
 function switchAnimation() {
   // Jouer l'animation de course si l'une des touches de mouvement est enfoncée
@@ -236,6 +306,8 @@ scene.add(light);
 function animate() {
   requestAnimationFrame(animate);
 
+  adjustWolfHeight(); // Ajustez la hauteur du loup à chaque frame
+
   if (wolf) {
     // Calculez la direction vers laquelle le loup fait face
     const direction = new THREE.Vector3();
@@ -243,22 +315,15 @@ function animate() {
 
     // Mise à jour de la position du loup en fonction de la direction
     if (moveForward) {
-      wolf.position.addScaledVector(direction, wolfSpeed);
+      moveWolf(direction, wolfSpeed);
     }
     if (moveBackward) {
-      wolf.position.addScaledVector(direction, -wolfSpeed);
+      moveWolf(direction.negate(), wolfSpeed);
     }
 
     // Rotation du loup
     if (rotateLeft) wolf.rotation.y += wolfRotationSpeed;
     if (rotateRight) wolf.rotation.y -= wolfRotationSpeed;
-
-    // Mettre à jour la position de la caméra pour maintenir l'offset
-    const cameraPosition = wolf.position.clone().add(cameraOffset);
-    camera.position.copy(cameraPosition);
-
-    // Faire en sorte que la caméra regarde toujours le loup
-    camera.lookAt(wolf.position);
   }
 
   // Mise à jour de l'AnimationMixer
